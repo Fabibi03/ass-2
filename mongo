@@ -1,0 +1,75 @@
+use PerformanceManagementSystem
+import pymongo
+
+from bson.objectid import ObjectId
+
+
+
+# Connect to MongoDB
+
+client = pymongo.MongoClient("mongodb:NBVAF11:27017/")
+
+db = client["performance_management"]
+
+objectives_collection = db["department_objectives"]
+
+employees_collection = db["employees"]
+
+supervisors_collection = db["supervisors"]
+
+
+
+# create department objectives
+
+def create_objective(objective_data):
+
+    objective_id = objectives_collection.insert_one(objective_data).inserted_id
+
+    return str(objective_id)
+
+
+
+#delete department objectives
+
+def delete_objective(objective_id):
+
+    objectives_collection.delete_one({"_id": ObjectId(objective_id)})
+
+
+
+# view employees' total scores
+
+def view_employees_total_scores():
+
+   
+
+
+
+# assign an employee to a supervisor
+
+def assign_employee_to_supervisor(employee_id, supervisor_id):
+
+    employees_collection.update_one(
+
+        {"_id": ObjectId(employee_id)},
+
+        {"$set": {"supervisor_id": ObjectId(supervisor_id)}}
+
+    )
+
+
+
+#  creating a department objective
+
+objective_data = {
+
+    "name": "Increase Department Productivity",
+
+    "description": "Improve the overall productivity of the department",
+
+    "weight": 30  
+
+}
+
+objective_id = create_objective(objective_data)
+
