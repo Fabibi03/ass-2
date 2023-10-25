@@ -25,21 +25,21 @@ var objectives = [Objective {id: "1", name: "Increase Productivity", description
 service /graphql on new graphql:Service {
     // Defining the "getEmployees" query resolver
     resource function getEmployees() returns [Employee] {
-        // Fetch and return the list of employees from data source (e.g., database)
+        // Fetching and returning the list of employees from data source
         return employees;
     }
-     createKPI(input KPI) returns KPI {
+     creatingKPI(input KPI) returning KPI {
         // Creating a new KPI and returning it
         KPI newKPI = {id: string(kpis.length() + 1), ...input};
         kpis.push(newKPI);
         return newKPI;
     }
-    // Define the "getObjectives" query resolver
+    // Defining the "getObjectives" query resolver
     resource function getObjectives() returns [Objective] {
         // Fetch and return the list of objectives from your data source
         return objectives;
     }
-    // Define the "createObjective" mutation resolver
+    // Defining the "createObjective" mutation resolver
     resource function createObjective(input Objective) returns Objective {
         // Create a new objective and return it (you should also store it in your data source)
         Objective newObjective = {id: string(objectives.length() + 1), ...input};
@@ -48,7 +48,7 @@ service /graphql on new graphql:Service {
     }
 }
 function main(string... args) {
-    // Start the Ballerina service with the GraphQL schema
+    // Starting the Ballerina service with the GraphQL schema
     graphql:ServiceConfig serviceConfig = {
         serviceType: graphql:Type.HTTP,
         serviceConfig: {
