@@ -1,0 +1,67 @@
+import ballerina/io;
+import ballerina/http;
+
+public function main() {
+    string graphqlEndpoint = "http://myapi/graphql?query={me{Fabs7045}}";
+
+    // query to get employees
+    string getEmployeesQuery = `{
+        getEmployees {
+            id
+            firstName
+            lastName
+            jobTitle
+        }
+    }`;
+
+    //Send the GraphQL query
+    var getEmployeesResponse = sendGraphQLQuery(graphqlEndpoint, getEmployeesQuery);
+
+    //Process the response
+    if (getEmployeesResponse is http:Response) {
+        if (getEmployeesResponse.statusCode == 200) {
+            io:println("Employees Data: " + getEmployeesResponse.getJsonPayload());
+        } else {
+            io:println("Error: " + getEmployeesResponse.getStringPayload());
+        }
+    } else {
+        io:println("Error occurred while sending the query.");
+    }
+
+    // GraphQL mutation to create a KPI
+    string createKPIMutation = `mutation {
+        createKPI(input: {
+            employeeId: "123",
+            name: "Productivity",
+            description: "Measure employee productivity"
+        }) {
+            id
+            name
+            description
+        }
+    }`;
+
+    // Send the GraphQL mutation
+    var createKPIResponse = sendGraphQLQuery(graphqlEndpoint, createKPIMutation);
+
+    // Process the response
+    if (createKPIResponse is http:Response) {
+        if (createKPIResponse.statusCode == 200) {
+            io:println("KPI Created: " + createKPIResponse.getJsonPayload());
+        } else {
+            io:println("Error: " + createKPIResponse.getStringPayload());
+        }
+    } else {
+        io:println("Error occurred while sending the mutation.");
+    }
+}
+
+function sendGraphQLQuery(string endpoint, string query) returns http:Response|error {
+    http:Request request = new;
+    request.addHeader("Content-Type", "application/json");
+    request.setPayload(query);
+
+    http:Response|error response = check http:post(endpoint, request);
+
+    return response;
+}
