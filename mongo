@@ -134,3 +134,40 @@ kpi_data = {
 }
 
 kpi_id = create_kpi(employee_id, kpi_data)
+
+#approve an employee's KPIs
+def approve_kpis(employee_id, kpi_id):
+    employees_collection.update_one(
+        {"_id": ObjectId(employee_id), "kpi._id": ObjectId(kpi_id)},
+        {"$set": {"kpi.$.approved": True}}
+    )
+
+# delete an employee's KPIs
+def delete_kpis(employee_id, kpi_id):
+    employees_collection.update_one(
+        {"_id": ObjectId(employee_id)},
+        {"$pull": {"kpi": {"_id": ObjectId(kpi_id)}}
+    )
+
+# update an employee's KPI
+def update_kpi(employee_id, kpi_id, new_data):
+    employees_collection.update_one(
+        {"_id": ObjectId(employee_id), "kpi._id": ObjectId(kpi_id)},
+        {"$set": {"kpi.$.name": new_data["name"], "kpi.$.description": new_data["description"]}}
+    )
+
+# view employee scores (only for employees assigned to the Supervisor)
+def view_employee_scores(supervisor_id):
+    employees = employees_collection.find({"supervisor_id": ObjectId(supervisor_id)})
+    for employee in employees:
+        employee_id = str(employee["_id"])
+        employee_name = employee["name"]
+        kpis = employee["kpi"]
+        # Calculate scores for each KPI and employee here
+
+# grade an employee's KPIs
+def grade_kpi(employee_id, kpi_id, score):
+    employees_collection.update_one(
+        {"_id": ObjectId(employee_id), "kpi._id": ObjectId(kpi_id)},
+        {"$set": {"kpi.$.score": score}}
+    )
