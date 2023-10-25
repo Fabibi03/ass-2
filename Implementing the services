@@ -1,1 +1,89 @@
-
+import ballerina/io;
+import ballerinax/graphql;
+type Employee record {
+    id string;
+    firstName string;
+    lastName string;
+    jobTitle string;
+};
+type KPI record {
+    id string;
+    employeeId string;
+    name string;
+    description string;
+    score float;
+};
+type Objective record {
+    id string;
+    name string;
+    description string;
+    weight int;
+};
+var employees = [Employee {id: "1", firstName: "John", lastName: "Doe", jobTitle: "Developer"}];
+var kpis = [KPI {id: "1", employeeId: "1", name: "Productivity", description: "Measure employee productivity", score: 4.5}];
+var objectives = [Objective {id: "1", name: "Increase Productivity", description: "Improve department productivity", weight: 30}];
+service /graphql on new graphql:Service {
+    // Defining the "getEmployees" query resolver
+    resource function getEmployees() returns [Employee] {
+        // Fetch and return the list of employees from data source (e.g., database)
+        return employees;
+    }
+     createKPI(input KPI) returns KPI {
+        // Creating a new KPI and returning it
+        KPI newKPI = {id: string(kpis.length() + 1), ...input};
+        kpis.push(newKPI);
+        return newKPI;
+    }
+    // Define the "getObjectives" query resolver
+    resource function getObjectives() returns [Objective] {
+        // Fetch and return the list of objectives from your data source
+        return objectives;
+    }
+    // Define the "createObjective" mutation resolver
+    resource function createObjective(input Objective) returns Objective {
+        // Create a new objective and return it (you should also store it in your data source)
+        Objective newObjective = {id: string(objectives.length() + 1), ...input};
+        objectives.push(newObjective);
+        return newObjective;
+    }
+}
+function main(string... args) {
+    // Start the Ballerina service with the GraphQL schema
+    graphql:ServiceConfig serviceConfig = {
+        serviceType: graphql:Type.HTTP,
+        serviceConfig: {
+            basePath: "graphql"
+        },
+        schema: `
+            type Employee {
+                id: String!
+                firstName: String!
+                lastName: String!
+                jobTitle: String!
+            }
+            type KPI {
+                id: String!
+                employeeId: String!
+                name: String!
+                description: String!
+                score: Float
+            }
+            type Objective {
+                id: String!
+                name: String!
+                description: String!
+                weight: Int
+            }
+            type Query {
+                getEmployees: [Employee]
+                getObjectives: [Objective]
+            }
+            type Mutation {
+                createKPI(input: KPI): KPI
+                createObjective(input: Objective): Objective
+            }
+    };
+    var httpService = check graphql:createService(serviceConfig);
+    check httpService.start({port: 8080});
+    io:println("GraphQL service started on port 8080");
+}
