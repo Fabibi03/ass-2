@@ -73,3 +73,64 @@ objective_data = {
 
 objective_id = create_objective(objective_data)
 
+#EMPLOYEE
+
+# creating KPIs for an employee
+
+def create_kpi(employee_id, kpi_data):
+
+    kpi_id = ObjectId()
+
+    employees_collection.update_one(
+
+        {"_id": ObjectId(employee_id)},
+
+        {"$push": {"kpi": {"_id": kpi_id, "name": kpi_data["name"], "description": kpi_data["description"]}}
+
+    )
+
+    return str(kpi_id)
+
+
+
+# grade the Supervisor
+
+def grade_supervisor(employee_id, supervisor_grade):
+
+    employees_collection.update_one(
+
+        {"_id": ObjectId(employee_id)},
+
+        {"$set": {"supervisor_grade": supervisor_grade}}
+
+    )
+
+
+
+# view an employee's scores
+
+def view_employee_scores(employee_id):
+
+    employee = employees_collection.find_one({"_id": ObjectId(employee_id)})
+
+    employee_name = employee["name"]
+
+    kpis = employee["kpi"]
+
+    # Calculate and return the scores for the KPIs
+
+
+
+# creating KPIs for an employee
+
+employee_id = "employee_id_here"  # Replace with the actual employee's ID
+
+kpi_data = {
+
+    "name": "Productivity",
+
+    "description": "Measure employee productivity"
+
+}
+
+kpi_id = create_kpi(employee_id, kpi_data)
